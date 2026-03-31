@@ -118,3 +118,7 @@ class CloudOptEnvironment:
             else:
                 cost += r.monthly_cost
         return round(cost, 2)
+    
+    def close(self):
+        """Mandatory OpenEnv API: Cleans up resources."""
+        pass
