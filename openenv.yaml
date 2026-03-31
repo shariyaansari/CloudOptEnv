@@ -1,0 +1,8 @@
+name: "CloudOptEnv"
+version: "0.1.0"
+description: "An environment where an AI agent acts as a DevOps engineer to optimize cloud infrastructure costs without causing downtime."
+entrypoint: "my_env.env:CloudOptEnvironment"
+tags:
+  - "cloud"
+  - "devops"
+  - "optimization"
