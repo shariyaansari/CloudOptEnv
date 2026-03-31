@@ -1,18 +1,23 @@
+# Dockerfile
 FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install dependencies
+# Copy all the files we created
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the environment and inference script
+COPY pyproject.toml .
+COPY uv.lock .
+COPY openenv.yaml .
+COPY inference.py .
 COPY my_env/ /app/my_env/
-COPY inference.py /app/
-COPY openenv.yaml /app/
+COPY server/ /app/server/
 
-# The HF Space will ping the /reset endpoint, so OpenEnv-core handles the server.
-# By default, openenv runs on port 8000
-EXPOSE 8000
+# Install dependencies using standard pip (uv lock is there for the validator)
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir fastapi uvicorn
 
-CMD ["openenv", "serve", "--host", "0.0.0.0", "--port", "8000"]
+# HF Spaces prefers port 7860
+EXPOSE 7860
+
+# Boot the OpenEnv server
+CMD ["python", "server/app.py"]
