@@ -17,6 +17,8 @@ class Observation(BaseModel):
     current_monthly_cost: float
     last_action_error: Optional[str] = None
     system_message: Optional[str] = None
+    reward: float
+    done: bool
 
 # --- ACTION SPACE ---
 class Action(BaseModel):
