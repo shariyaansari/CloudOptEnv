@@ -1,13 +1,11 @@
 import copy
 from typing import Tuple, List
+from openenv.core.env_server import Environment  # <--- NEW: Import the base class
 from .models import Observation, Action, Reward, Info, CloudResource
 
-class CloudOptEnvironment:
+class CloudOptEnvironment(Environment):          # <--- NEW: Inherit from it
     def __init__(self, task_module):
-        """
-        task_module is one of our task files (e.g., tasks.easy)
-        It must implement get_initial_state() and grade()
-        """
+        super().__init__()                       # <--- NEW: Initialize the base class
         self.task = task_module
         self.max_steps = 10
         self.current_step = 0
@@ -31,7 +29,7 @@ class CloudOptEnvironment:
         """Mandatory OpenEnv API: Returns the full internal state."""
         return {
             "step": self.current_step,
-            "resources": [r.model_dump() for r in self.resources], # Pydantic v2 dump
+            "resources": [r.model_dump() for r in self.resources],
             "initial_cost": self.initial_cost,
             "current_cost": self._calculate_current_cost(),
             "done": self.done
@@ -52,18 +50,17 @@ class CloudOptEnvironment:
 
         if action.command != "noop" and not target:
             error_msg = f"Resource {action.resource_id} not found."
-            step_reward = -0.05  # Slight penalty for hallucinating IDs
+            step_reward = -0.05
 
         elif action.command == "terminate_resource":
             if target.tags.get("env") == "prod":
-                # DESTRUCTIVE ACTION PENALTY (Judges love this)
                 error_msg = f"CRITICAL: Terminated production resource {target.id}!"
                 step_reward = -1.0
                 critical_failure = True
                 self.done = True
             else:
                 self.resources.remove(target)
-                step_reward = 0.1 # Minor positive reinforcement for a valid action
+                step_reward = 0.1
 
         elif action.command == "stop_resource":
             if target.type == "ec2_instance" and target.status == "running":
@@ -79,13 +76,11 @@ class CloudOptEnvironment:
             else:
                 error_msg = f"Cannot release {target.id} (it might be in-use)"
 
-        # Enforce step limit
         if self.current_step >= self.max_steps:
             self.done = True
 
-        # Ask the specific task to grade the current state
         task_reward, task_done = self.task.grade(self.state(), action)
-        total_reward = max(-1.0, min(1.0, step_reward + task_reward)) # Clamp between -1.0 and 1.0
+        total_reward = max(-1.0, min(1.0, step_reward + task_reward))
 
         if task_done:
             self.done = True
@@ -114,11 +109,7 @@ class CloudOptEnvironment:
         cost = 0.0
         for r in self.resources:
             if r.status == "stopped" and r.type == "ec2_instance":
-                cost += r.monthly_cost * 0.1  # Stopped instances still incur storage costs
+                cost += r.monthly_cost * 0.1
             else:
                 cost += r.monthly_cost
         return round(cost, 2)
-    
-    def close(self):
-        """Mandatory OpenEnv API: Cleans up resources."""
-        pass
