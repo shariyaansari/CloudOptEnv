@@ -1,3 +1,17 @@
+---
+title: CloudOptEnv
+emoji: ☁️
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
+# CloudOptEnv ☁️💰
+
+**An OpenEnv submission for real-world Cloud Infrastructure Cost Optimization.**
+... (keep the rest of your README exactly the same)
+
 # CustomerSupportEnv
 
 **An environment for training AI agents to handle customer support interactions.**
