@@ -95,30 +95,30 @@ class CloudOptEnvironment(Environment):          # <--- NEW: Inherit from it
             Info(cost_saved=cost_saved, critical_failure=critical_failure)
         )
 
-    # def _get_observation(self, error: str = None) -> Observation:
-    #     return Observation(
-    #         step=self.current_step,
-    #         goal=self.goal,
-    #         resources=self.resources,
-    #         current_monthly_cost=self._calculate_current_cost(),
-    #         last_action_error=error,
-    #         system_message="Environment active." if not self.done else "Episode terminated."
-    #     )
-    def _get_observation(self) -> Observation:
-        current_cost = sum(r.monthly_cost for r in self.resources)
-
+    def _get_observation(self, error: str = None) -> Observation:
         return Observation(
             step=self.current_step,
             goal=self.goal,
             resources=self.resources,
-            current_monthly_cost=current_cost,
-            last_action_error=None,
-            system_message=None,
+            current_monthly_cost=self._calculate_current_cost(),
+            last_action_error=error,
+            system_message="Environment active." if not self.done else "Episode terminated."
+        )
+    
+    # def _get_observation(self) -> Observation:
+    #     current_cost = sum(r.monthly_cost for r in self.resources)
 
-            reward=0.0,        # reset always starts neutral
-            done=self.done     # usually False at reset
-    )
-        
+    #     return Observation(
+    #         step=self.current_step,
+    #         goal=self.goal,
+    #         resources=self.resources,
+    #         current_monthly_cost=current_cost,
+    #         last_action_error=None,
+    #         system_message=None,
+
+    #         reward=0.0,        # reset always starts neutral
+    #         done=self.done     # usually False at reset
+    # )
         
     def _calculate_current_cost(self) -> float:
         cost = 0.0
