@@ -44,6 +44,8 @@ def run_task(client: OpenAI, task_name: str, task_module) -> float:
     print(f"Starting Task: {task_name}")
     print(f"{'='*40}")
     
+    print(f"[START] task={task_name}", flush=True)
+    
     env = CloudOptEnvironment(task_module)
     obs = env.reset()
     
@@ -95,7 +97,10 @@ def run_task(client: OpenAI, task_name: str, task_module) -> float:
         
         print(f"Step Reward: {reward.score:.2f} | Info: {info.model_dump()}")
         
+        print(f"[STEP] step={step} reward={reward.score}", flush=True)
+        
     print(f"\nTask {task_name} Complete. Total Reward: {total_reward:.2f}")
+    print(f"[END] task={task_name} score={total_reward} steps={actual_steps}", flush=True)
     return total_reward
 
 def main():
