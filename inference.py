@@ -101,9 +101,13 @@ def run_task(client: OpenAI, task_name: str, task_module) -> float:
         
         print(f"[STEP] step={step} reward={reward.score}", flush=True)
         
-    print(f"\nTask {task_name} Complete. Total Reward: {total_reward:.2f}")
-    print(f"[END] task={task_name} score={total_reward} steps={step}", flush=True)
-    return total_reward
+    print(f"\nTask {task_name} Complete. Raw Total Reward: {total_reward:.2f}")
+    
+    final_score = max(0.01, min(0.99, total_reward))
+    
+    print(f"[END] task={task_name} score={final_score} steps={step}", flush=True)
+    
+    return final_score
 
 def main():
     if not API_KEY:
