@@ -50,10 +50,12 @@ def run_task(client: OpenAI, task_name: str, task_module) -> float:
     obs = env.reset()
     
     total_reward = 0.0
+    actual_steps = 0
     
     for step in range(1, MAX_STEPS + 1):
         if env.done:
             break
+        actual_steps = step
             
         print(f"\n--- Step {step} ---")
         print(f"Goal: {obs.goal}")
@@ -100,7 +102,7 @@ def run_task(client: OpenAI, task_name: str, task_module) -> float:
         print(f"[STEP] step={step} reward={reward.score}", flush=True)
         
     print(f"\nTask {task_name} Complete. Total Reward: {total_reward:.2f}")
-    print(f"[END] task={task_name} score={total_reward} steps={actual_steps}", flush=True)
+    print(f"[END] task={task_name} score={total_reward} steps={step}", flush=True)
     return total_reward
 
 def main():
